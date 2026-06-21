@@ -22,6 +22,7 @@ export async function transactionRoutes(app: FastifyInstance) {
       month = `${date.getMonth().toString().padStart(2, '0')}/${date.getFullYear().toString().padStart(4, '0')}`
     }
     const txs = await service.getAll(request.userId, month);
+
     return reply.send(txs);
   });
 

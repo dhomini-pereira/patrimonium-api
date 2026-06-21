@@ -21,20 +21,35 @@ export class TransactionRepository {
   }
 
   async findMonthTotalByUser(userId: string, page: number): Promise<MonthTotalResult[]> {
-    const limit = 10;
-    const offset = page !== 0 ? page * limit : 0;
-    console.log(limit, offset, userId);
     const { rows } = await this.pool.query(
-      'SELECT TO_CHAR(date, \'MM/YYYY\') as month, SUM(amount) as totalAmount FROM transactions WHERE user_id = $1 GROUP BY TO_CHAR(date, \'MM/YYYY\') ORDER BY TO_CHAR(date, \'MM/YYYY\') DESC OFFSET $2 LIMIT $3',
-      [userId, offset, limit]
+      `WITH reference_month AS (
+          SELECT COALESCE(
+              date_trunc('month', MAX(date)),
+              date_trunc('month', CURRENT_DATE)
+          ) AS month_date
+          FROM transactions
+          WHERE user_id = $1
+      ),
+      months AS (
+          SELECT
+              reference_month.month_date
+              - (($2 * 10) + gs.n) * interval '1 month' AS month_date
+          FROM reference_month
+          CROSS JOIN generate_series(0, 9) AS gs(n)
+      )
+      SELECT
+          TO_CHAR(m.month_date, 'MM/YYYY') AS month,
+          COALESCE(SUM(t.amount), 0) AS "totalAmount"
+      FROM months m
+      LEFT JOIN transactions t
+          ON t.user_id = $1
+          AND date_trunc('month', t.date) = m.month_date
+      GROUP BY m.month_date
+      ORDER BY m.month_date DESC;`,
+      [userId, page > 0 ? page - 1 : page]
     );
 
-    return rows.map((row) => {
-      return {
-        month: row.month,
-        totalAmount: row.totalamount,
-      }
-    });
+    return rows;
   }
 
   async findById(id: string, userId: string): Promise<Transaction | null> {
