@@ -2,16 +2,39 @@ import { injectable, inject } from 'tsyringe';
 import { Pool } from 'pg';
 import type { Transaction } from '../entities';
 
+export type DateMonthYear = `${number | string}/${number | string}`;
+type MonthTotalResult = {
+  month: DateMonthYear;
+  totalAmount: number;
+}
+
 @injectable()
 export class TransactionRepository {
   constructor(@inject('DatabasePool') private pool: Pool) {}
 
-  async findAllByUser(userId: string): Promise<Transaction[]> {
+  async findAllByUserAndMonth(userId: string, month: DateMonthYear): Promise<Transaction[]> {
     const { rows } = await this.pool.query(
-      'SELECT * FROM transactions WHERE user_id = $1 ORDER BY date DESC, created_at DESC',
-      [userId]
+      'SELECT * FROM transactions WHERE user_id = $1 AND TO_CHAR(date, \'MM/YYYY\') = $2 ORDER BY date DESC, created_at DESC',
+      [userId, month]
     );
     return rows;
+  }
+
+  async findMonthTotalByUser(userId: string, page: number): Promise<MonthTotalResult[]> {
+    const limit = 10;
+    const offset = page !== 0 ? page * limit : 0;
+    console.log(limit, offset, userId);
+    const { rows } = await this.pool.query(
+      'SELECT TO_CHAR(date, \'MM/YYYY\') as month, SUM(amount) as totalAmount FROM transactions WHERE user_id = $1 GROUP BY TO_CHAR(date, \'MM/YYYY\') ORDER BY TO_CHAR(date, \'MM/YYYY\') DESC OFFSET $2 LIMIT $3',
+      [userId, offset, limit]
+    );
+
+    return rows.map((row) => {
+      return {
+        month: row.month,
+        totalAmount: row.totalamount,
+      }
+    });
   }
 
   async findById(id: string, userId: string): Promise<Transaction | null> {

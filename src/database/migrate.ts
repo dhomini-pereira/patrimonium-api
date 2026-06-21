@@ -1,5 +1,5 @@
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { pool } from '../config/database';
 
 async function migrate() {
@@ -39,8 +39,8 @@ async function migrate() {
       if (!clean) continue;
       try {
         await client.query(stmt);
-      } catch (err: any) {
-        console.error('⚠️  Statement failed:', stmt.substring(0, 80), '...', err.message);
+      } catch (err: unknown) {
+        if (err instanceof Error) console.error('⚠️  Statement failed:', stmt.substring(0, 80), '...', err.message);
       }
     }
 

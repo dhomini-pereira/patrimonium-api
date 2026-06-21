@@ -42,7 +42,7 @@ export class AuthService {
     return crypto.randomBytes(64).toString('hex');
   }
 
-  private toDTO(user: any): UserDTO {
+  private toDTO(user: { id: string, name: string, email: string }): UserDTO {
     return { id: user.id, name: user.name, email: user.email };
   }
 

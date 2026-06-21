@@ -1,7 +1,7 @@
 import { injectable, inject } from 'tsyringe';
 import { Pool } from 'pg';
 import { Expo, ExpoPushMessage } from 'expo-server-sdk';
-import { TransactionRepository } from '../repositories/TransactionRepository';
+import { DateMonthYear, TransactionRepository } from '../repositories/TransactionRepository';
 import { AccountRepository } from '../repositories/AccountRepository';
 import { CreditCardRepository } from '../repositories/CreditCardRepository';
 import { CreditCardService } from './CreditCardService';
@@ -52,9 +52,13 @@ export class TransactionService {
     };
   }
 
-  async getAll(userId: string): Promise<TransactionDTO[]> {
-    const txs = await this.txRepo.findAllByUser(userId);
+  async getAll(userId: string, month: DateMonthYear): Promise<TransactionDTO[]> {
+    const txs = await this.txRepo.findAllByUserAndMonth(userId, month);
     return txs.map(this.toDTO);
+  }
+
+  async getMonths(userId: string, page: number) {
+    return await this.txRepo.findMonthTotalByUser(userId, page);
   }
 
   async create(userId: string, data: {

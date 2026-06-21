@@ -1,14 +1,27 @@
-import { FastifyInstance } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { container } from '../container';
-import { TransactionService } from '../services/TransactionService';
 import { authMiddleware } from '../middlewares/authMiddleware';
+import type { DateMonthYear } from '../repositories/TransactionRepository';
+import type { TransactionService } from '../services/TransactionService';
 
 export async function transactionRoutes(app: FastifyInstance) {
   app.addHook('preHandler', authMiddleware);
   const service = container.resolve<TransactionService>('TransactionService');
 
+  app.get('/transactions/months', async (request, reply) => {
+    const page = Number((request.query as { page: string | null}).page || 0);
+    const tsx = await service.getMonths(request.userId, page);
+    return reply.send(tsx);
+  });
+
   app.get('/transactions', async (request, reply) => {
-    const txs = await service.getAll(request.userId);
+    let month = (request.query as { month: DateMonthYear | null }).month;
+
+    if (!month) {
+      const date = new Date();
+      month = `${date.getMonth().toString().padStart(2, '0')}/${date.getFullYear().toString().padStart(4, '0')}`
+    }
+    const txs = await service.getAll(request.userId, month);
     return reply.send(txs);
   });
 
