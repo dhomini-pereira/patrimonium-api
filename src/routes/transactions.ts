@@ -57,6 +57,18 @@ export async function transactionRoutes(app: FastifyInstance) {
     }
   });
 
+  app.get('/transactions/:id', async (request, reply) => {
+    const { id } = request.params as any;
+
+    try {
+      const tx = await service.getById(id, request.userId);
+      if (!tx) return reply.status(204).send();
+      return reply.status(200).send(tx);
+    } catch (err: any) {
+      return reply.status(err.statusCode || 500).send({ message: err.message });
+    }
+  })
+
   app.post('/transfers', async (request, reply) => {
     const { fromAccountId, toAccountId, amount, description } = request.body as any;
     if (!fromAccountId || !toAccountId || !amount) {

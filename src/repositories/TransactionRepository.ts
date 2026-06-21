@@ -6,6 +6,7 @@ export type DateMonthYear = `${number | string}/${number | string}`;
 type MonthTotalResult = {
   month: DateMonthYear;
   totalAmount: number;
+  totalTransactions: number;
 }
 
 @injectable()
@@ -39,7 +40,17 @@ export class TransactionRepository {
       )
       SELECT
           TO_CHAR(m.month_date, 'MM/YYYY') AS month,
-          COALESCE(SUM(t.amount), 0) AS "totalAmount"
+          COALESCE(
+              SUM(
+                  CASE
+                      WHEN t.type = 'income' THEN t.amount
+                      WHEN t.type = 'expense' THEN -t.amount
+                      ELSE 0
+                  END
+              ),
+              0
+          ) AS "totalAmount",
+          COUNT(t.id) as totalTransactions
       FROM months m
       LEFT JOIN transactions t
           ON t.user_id = $1

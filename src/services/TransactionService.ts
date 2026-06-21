@@ -52,6 +52,11 @@ export class TransactionService {
     };
   }
 
+  async getById(id: string, userId: string) {
+    const tx = await this.txRepo.findById(id, userId);
+    return this.toDTO(tx);
+  }
+
   async getAll(userId: string, month: DateMonthYear): Promise<TransactionDTO[]> {
     const txs = await this.txRepo.findAllByUserAndMonth(userId, month);
     return txs.map(this.toDTO);
