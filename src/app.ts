@@ -1,43 +1,18 @@
-import './container';
-import Fastify from 'fastify';
-import cors from '@fastify/cors';
-import { authRoutes } from './routes/auth';
-import { accountRoutes } from './routes/accounts';
-import { transactionRoutes } from './routes/transactions';
-import { categoryRoutes } from './routes/categories';
-import { investmentRoutes } from './routes/investments';
-import { goalRoutes } from './routes/goals';
-import { cronRoutes } from './routes/cron';
-import { pushTokenRoutes } from './routes/pushTokens';
-import { creditCardRoutes } from './routes/creditCards';
-import { familyMemberRoutes } from './routes/familyMembers';
-import { sharedAccountRoutes } from './routes/sharedAccounts';
-import { insightsRoutes } from './routes/insights';
+import './configs/auto-start.config';
+import { fastify } from "fastify";
+import { container } from './configs/container.config';
+import type { LoggerPlugin } from './http/plugins/logger.plugin';
 
-export async function buildApp() {
-  const app = Fastify({
-    logger: true,
-  });
+export const app = fastify();
 
-  await app.register(cors, {
-    origin: true,
-    credentials: true,
-  });
+const loggerPlugin = container.resolve<LoggerPlugin>("LoggerPlugin");
 
-  await app.register(authRoutes);
-  await app.register(accountRoutes);
-  await app.register(transactionRoutes);
-  await app.register(categoryRoutes);
-  await app.register(investmentRoutes);
-  await app.register(goalRoutes);
-  await app.register(cronRoutes);
-  await app.register(pushTokenRoutes);
-  await app.register(creditCardRoutes);
-  await app.register(familyMemberRoutes);
-  await app.register(sharedAccountRoutes);
-  await app.register(insightsRoutes);
+app.addHook('onRequest', loggerPlugin.onRequest);
+app.addHook('onResponse', loggerPlugin.onResponse);
 
-  app.get('/health', async () => ({ status: 'ok', timestamp: new Date().toISOString() }));
-
-  return app;
-}
+app.get("/health", (_req, reply) => {
+  return reply.status(200).send({
+    uptime: Date.now(),
+    status: "OK",
+  })
+});

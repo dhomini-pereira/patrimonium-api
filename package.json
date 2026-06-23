@@ -1,30 +1,41 @@
 {
-  "name": "financial-app-backend",
+  "name": "patrimonium-api",
   "version": "1.0.0",
-  "main": "src/server.ts",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js",
-    "migrate": "tsx src/database/migrate.ts"
+    "dev": "tsx watch --env-file=.env src/server.ts",
+    "start": "node dist/server.ts"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.0.9",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
   "dependencies": {
     "@fastify/cors": "^11.2.0",
-    "bcryptjs": "^2.4.3",
-    "dotenv": "^16.5.0",
-    "expo-server-sdk": "^5.0.0",
-    "fastify": "^5.7.4",
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "^0.45.2",
+    "expo-server-sdk": "^6.1.0",
+    "fastify": "^5.8.5",
+    "http-status": "^2.1.0",
     "jsonwebtoken": "^9.0.3",
-    "pg": "^8.16.0",
+    "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
     "tsyringe": "^4.10.0"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^2.4.6",
-    "@types/jsonwebtoken": "^9.0.9",
-    "@types/node": "^22.15.0",
-    "@types/pg": "^8.15.4",
-    "tsx": "^4.19.4",
-    "typescript": "^5.9.3"
+    "@types/http-status": "^1.1.2",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.0.0",
+    "@types/pg": "^8.20.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
   }
 }
