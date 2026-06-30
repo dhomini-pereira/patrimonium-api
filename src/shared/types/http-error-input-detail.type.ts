@@ -1,4 +1,4 @@
 export type HTTPErrorInputDetailType = {
-  reason: string;
   cause: unknown;
+  reason: string;
 };

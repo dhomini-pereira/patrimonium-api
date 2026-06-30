@@ -18,25 +18,25 @@ import { UserModel } from "./models/user.model";
 @injectable()
 export class DatabaseConnection {
   public db: NodePgDatabase<{
-    user: typeof UserModel,
-    refreshToken: typeof RefreshTokenModel,
-    account: typeof AccountModel,
-    category: typeof CategoryModel,
-    transaction: typeof TransactionModel,
-    investment: typeof InvestmentModel,
-    goal: typeof GoalModel,
-    pushToken: typeof PushTokenModel,
-    creditCard: typeof CreditCardModel,
-    creditCardInvoice: typeof CreditCardInvoiceModel,
-    familyMember: typeof FamilyMemberModel,
-    sharedAccount: typeof SharedAccountModel,
+    user: typeof UserModel;
+    refreshToken: typeof RefreshTokenModel;
+    account: typeof AccountModel;
+    category: typeof CategoryModel;
+    transaction: typeof TransactionModel;
+    investment: typeof InvestmentModel;
+    goal: typeof GoalModel;
+    pushToken: typeof PushTokenModel;
+    creditCard: typeof CreditCardModel;
+    creditCardInvoice: typeof CreditCardInvoiceModel;
+    familyMember: typeof FamilyMemberModel;
+    sharedAccount: typeof SharedAccountModel;
   }>;
-  constructor(
-    @inject("Env") private env: typeof ENV_CONFIG,
-  ) {
+  constructor(@inject("Env") private env: typeof ENV_CONFIG) {
     const pool = new Pool({
       connectionString: this.env.DATABASE_URL,
-      ssl: this.env.DATABASE_URL.includes('sslmode=require') ? { rejectUnauthorized: false } : undefined,
+      ssl: this.env.DATABASE_URL.includes("sslmode=require")
+        ? { rejectUnauthorized: false }
+        : undefined,
       max: 20,
       idleTimeoutMillis: 30000,
       connectionTimeoutMillis: 10000,
@@ -57,10 +57,10 @@ export class DatabaseConnection {
         creditCardInvoice: CreditCardInvoiceModel,
         familyMember: FamilyMemberModel,
         sharedAccount: SharedAccountModel,
-      }
+      },
     });
 
-    pool.on('error', (err) => {
+    pool.on("error", (err) => {
       console.error("[DATABASE] Unexpected database pool error", err);
     });
   }

@@ -5,7 +5,8 @@ import type { RequestStore } from "@/shared/types/request-store.type";
 @injectable()
 export class RequestContext {
   constructor(
-    @inject("AsyncLocalStorage") private readonly asyncLocalStorage: AsyncLocalStorage<RequestStore>,
+    @inject("AsyncLocalStorage")
+    private readonly asyncLocalStorage: AsyncLocalStorage<RequestStore>,
   ) {}
 
   run<T>(store: RequestStore, callback: () => T): T {
