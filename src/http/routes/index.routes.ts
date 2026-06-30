@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { inject, injectable } from "tsyringe";
 import type { ErrorMiddleware } from "../middlewares/error.middleware";
 import type { LoggerPlugin } from "../plugins/logger.plugin";
+import type { AccountRoutes } from "./account.routes";
 import type { AuthRoutes } from "./auth.routes";
 import type { CategoryRoutes } from "./category.routes";
 
@@ -13,6 +14,7 @@ export class ServerRoutes {
     @inject("LoggerPlugin") private loggerPlugin: LoggerPlugin,
     @inject("AuthRoutes") private authRoutes: AuthRoutes,
     @inject("CategoryRoutes") private categoryRoutes: CategoryRoutes,
+    @inject("AccountRoutes") private accountRoutes: AccountRoutes,
   ) {}
 
   registerRoutes() {
@@ -41,5 +43,6 @@ export class ServerRoutes {
 
     this.authRoutes.registerRoutes();
     this.categoryRoutes.registerRoutes();
+    this.accountRoutes.registerRoutes();
   }
 }
