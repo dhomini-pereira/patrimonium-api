@@ -21,9 +21,21 @@ export class ServerRoutes {
     this.server.addHook("onResponse", this.loggerPlugin.onResponse);
 
     this.server.get("/health", (_req, reply) => {
+      const memoryUsage = process.memoryUsage();
       return reply.status(200).send({
-        uptime: Date.now(),
         status: "OK",
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+        version: process.env.npm_package_version || "1.0.0",
+        environment: process.env.NODE_ENV || "development",
+        pid: process.pid,
+        nodeVersion: process.version,
+        memory: {
+          rss: `${Math.round(memoryUsage.rss / 1024 / 1024)} MB`,
+          heapUsed: `${Math.round(memoryUsage.heapUsed / 1024 / 1024)} MB`,
+          heapTotal: `${Math.round(memoryUsage.heapTotal / 1024 / 1024)} MB`,
+          external: `${Math.round(memoryUsage.external / 1024 / 1024)} MB`,
+        },
       });
     });
 
