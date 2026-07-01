@@ -25,14 +25,14 @@ export class LoggerInstance {
     this.write("warn", message, metadata);
   }
 
-  error(message: string, metadata?: Record<string, unknown>) {
+  error(message: string, metadata?: unknown) {
     this.write("error", message, metadata);
   }
 
   private write(
     level: LogLevel,
     message: string,
-    metadata?: Record<string, unknown>,
+    metadata?: unknown,
   ) {
     this.logs.push({
       timestamp: new Date().toISOString(),

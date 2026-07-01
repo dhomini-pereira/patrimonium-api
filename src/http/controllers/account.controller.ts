@@ -1,10 +1,12 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
-import { injectable } from "tsyringe";
+import { inject, injectable } from "tsyringe";
 import type { AccountService } from "@/core/services/account.service";
 
 @injectable()
 export class AccountController {
-  constructor(private accountService: AccountService) {}
+  constructor(
+    @inject("AccountService") private accountService: AccountService
+  ) { }
 
   async getAllAccounts(request: FastifyRequest, reply: FastifyReply) {
     const accounts = await this.accountService.getAll(request.userId);

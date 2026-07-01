@@ -5,5 +5,5 @@ export interface LogEntry {
   level: LogLevel;
   context: string;
   message: string;
-  metadata?: Record<string, unknown>;
+  metadata?: unknown;
 }

@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import type {
   DoneFuncWithErrOrRes,
+  FastifyInstance,
   FastifyReply,
   FastifyRequest,
   HookHandlerDoneFunction,
@@ -13,9 +14,16 @@ import type { Logger } from "@/infra/logger/logger";
 export class LoggerPlugin {
   constructor(
     @inject("RequestContext") private requestContext: RequestContext,
+    @inject("Server") private server: FastifyInstance,
     @inject("Logger") private logger: Logger,
-  ) {}
-  onRequest = (
+  ) { }
+
+  registerPlugin() {
+    this.server.addHook("onRequest", this.onRequest);
+    this.server.addHook("onResponse", this.onResponse);
+  }
+
+  private onRequest = (
     request: FastifyRequest,
     _reply: FastifyReply,
     done: DoneFuncWithErrOrRes,
@@ -39,7 +47,7 @@ export class LoggerPlugin {
     );
   };
 
-  onResponse = (
+  private onResponse = (
     _request: FastifyRequest,
     reply: FastifyReply,
     done: HookHandlerDoneFunction,

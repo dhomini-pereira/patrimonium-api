@@ -21,10 +21,8 @@ export class ServerRoutes {
 
   registerRoutes() {
     this.swaggerPlugin.registerPlugin();
-    this.server.setErrorHandler(this.errorMiddleware.handle);
-    this.server.addHook("onRequest", this.loggerPlugin.onRequest);
-    this.server.addHook("onResponse", this.loggerPlugin.onResponse);
-
+    this.loggerPlugin.registerPlugin();
+    this.errorMiddleware.registerMiddleware();
 
     this.server.get("/health", (_req, reply) => {
       const memoryUsage = process.memoryUsage();

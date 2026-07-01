@@ -1,11 +1,22 @@
-import type { FastifyReply, FastifyRequest } from "fastify";
-import { injectable } from "tsyringe";
+import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { inject, injectable } from "tsyringe";
 import { HTTPError } from "@/core/errors/http.error";
 import { InternalServerError } from "@/core/errors/internal-server.error";
+import type { LoggerInstance } from "@/infra/logger/logger-instance";
 
 @injectable()
 export class ErrorMiddleware {
-  handle = (err: unknown, _request: FastifyRequest, reply: FastifyReply) => {
+  constructor(
+    @inject("Logger") private logger: LoggerInstance,
+    @inject("Server") private server: FastifyInstance,
+  ) { }
+
+  registerMiddleware() {
+    this.server.setErrorHandler(this.handle);
+  }
+
+  private handle = (err: unknown, _request: FastifyRequest, reply: FastifyReply) => {
+    this.logger.error("Error", err);
     if (err instanceof HTTPError) {
       return reply.status(err.statusCode).send({
         message: err.message,

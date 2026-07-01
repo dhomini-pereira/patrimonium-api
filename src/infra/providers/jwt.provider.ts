@@ -1,8 +1,6 @@
 import jwt, {
-  JsonWebTokenError,
   type JwtPayload,
   type SignOptions,
-  TokenExpiredError,
 } from "jsonwebtoken";
 import { inject, injectable } from "tsyringe";
 import type { env as ENV_CONFIG } from "@/configs/env.config";
@@ -39,14 +37,14 @@ export class JWTProvider {
     );
 
     if (err) {
-      if (err instanceof TokenExpiredError) {
+      if (err instanceof jwt.TokenExpiredError) {
         throw new ForbiddenError({
           reason: "Expired token.",
           cause: err,
         });
       }
 
-      if (err instanceof JsonWebTokenError) {
+      if (err instanceof jwt.JsonWebTokenError) {
         throw new UnauthorizedError({
           reason: "User not authorized.",
           cause: err,
@@ -59,6 +57,6 @@ export class JWTProvider {
       });
     }
 
-    return result;
+    return result as T;
   }
 }
