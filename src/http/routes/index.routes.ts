@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { inject, injectable } from "tsyringe";
 import type { ErrorMiddleware } from "../middlewares/error.middleware";
 import type { LoggerPlugin } from "../plugins/logger.plugin";
+import type { SwaggerPlugin } from "../plugins/swagger.plugin";
 import type { AccountRoutes } from "./account.routes";
 import type { AuthRoutes } from "./auth.routes";
 import type { CategoryRoutes } from "./category.routes";
@@ -15,12 +16,15 @@ export class ServerRoutes {
     @inject("AuthRoutes") private authRoutes: AuthRoutes,
     @inject("CategoryRoutes") private categoryRoutes: CategoryRoutes,
     @inject("AccountRoutes") private accountRoutes: AccountRoutes,
+    @inject("SwaggerPlugin") private swaggerPlugin: SwaggerPlugin,
   ) {}
 
   registerRoutes() {
+    this.swaggerPlugin.registerPlugin();
     this.server.setErrorHandler(this.errorMiddleware.handle);
     this.server.addHook("onRequest", this.loggerPlugin.onRequest);
     this.server.addHook("onResponse", this.loggerPlugin.onResponse);
+
 
     this.server.get("/health", (_req, reply) => {
       const memoryUsage = process.memoryUsage();
